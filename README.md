@@ -1,58 +1,117 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Sistema de Gestión de Tareas 
+Descripción del Proyecto 
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+El Sistema de Gestión de Tareas  es una aplicación que permite a los usuarios crear, asignar y rastrear tareas de manera efectiva. Está diseñado para facilitar la colaboracion en equipo y asegurar el cumplimiento de las tareas dentro del tiempo asignado.  
 
-## About Laravel
+Caracteristicas principales: 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+    Crear y gestionar tareas.
+    Asignar tareas a usuarios especificos.
+    Agregar comentarios para actualizar el progreso de una tarea.
+    Cambiar el estado de las tareas (por ejemplo: "pendiente", "en progreso", "completada").
+    Supervisar la productividad mediante la gestión de tareas y su estado.
+     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Estructura del proyecto 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+El proyecto está organizado en los siguientes paquetes: 
+ 
+src/
+├── modelo/
+│   ├── Tarea.java         - Clase que representa una tarea con atributos como titulo, descripción y estado.
+│   ├── Usuario.java       - Clase que representa a un usuario con atributos como nombre, correo y rol.
+│   ├── Comentario.java    - Clase que representa un comentario asociado a una tarea.
+│   └── Proyecto.java      - Clase que agrupa varias tareas relacionadas.
+├── servicio/
+│   ├── GestorTareas.java  - Clase que gestiona todas las operaciones relacionadas con las tareas.
+│   └── GestorUsuarios.java - Clase que gestiona todas las operaciones relacionadas con los usuarios.
+└── principal/
+    └── Main.java          - Clase principal que contiene la interfaz de consola para interactuar con el sistema.
+ 
+ 
+Instrucciones para compilar y ejecutar 
+Requisitos: 
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+    Java Development Kit (JDK) instalado.
+    Un editor de texto o IDE (como IntelliJ IDEA, Eclipse o VS Code).
+     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Pasos de instalacion: 
 
-## Learning Laravel
+    Compilar el proyecto :
+    Opcion 1: Una vez se tenga descargado el achivo, crear un folder llamado "Modelo" SI NO SE CREA SOLO AL DESCOMPRIMIR, y descomprimir el zip dentro de el, luego abre su IDE seleciona nuevo proyecto y se va a la carpeta donde lo         descomprimio y seleciona "open"
+	
+    Opcion 2(no siempre funciona) : Abre una terminal en la raíz del proyecto y ejecuta el siguiente comando para compilar todas las clases: 
+    bash
+    
+	1
+	javac src/modelo/*.java src/servicio/*.java src/utilidades/*.java src/principal/Main.java
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Ejecutar el proyecto :
+Una vez compilado, ejecuta el programa con el siguiente comando: 
+bash
+ 
+    java -cp src principal.Main
+     
+     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    Interactuar con el sistema :
+    Al ejecutar el programa, veras un menu interactivo con opciones para: 
+        Crear tareas.
+        Ver tareas asignadas.
+        Agregar comentarios a una tarea.
+        Cambiar el estado de una tarea.
+        Registrar nuevos usuarios.
+         
+     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Funcionalidades Implementadas 
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+    Gestión de Tareas : 
+        Crear nuevas tareas con titulo, descripcion y fecha de vencimiento.
+        Asignar tareas a usuarios especificos.
+        Cambiar el estado de las tareas (pendiente, en progreso, completada).
+         
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+    Comentarios : 
+        Agregar comentarios a una tarea para proporcionar actualizaciones o retroalimentacion.
+         
 
-## Agentic Development
+    Gestion de usuarios : 
+        Registrar nuevos usuarios con roles especificos (administrador, usuario, supervisor).
+        Asignar tareas a usuarios desde el rol de supervisor.
+         
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+    Validaciones : 
+        Validar correos electronicos y fechas de vencimiento para garantizar datos correctos.
+         
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-```bash
-composer require laravel/boost --dev
+Consideraciones especiales 
 
-php artisan boost:install
-```
+    Roles de Usuario : 
+        Administrador : Gestiona el acceso de todos los usuarios.
+        Usuario : Crea y gestiona sus propias tareas.
+        Supervisor : Asigna tareas y monitorea el progreso de los usuarios.
+         
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+    Proyectos (Opcional) : 
+        La clase Proyecto permite agrupar tareas relacionadas. Esta funcionalidad puede ser expandida en futuras versiones.
+         
+     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+Este sistema es altamente escalable y puede mejorarse en el futuro agregando características como: 
 
-## Contributing
+    Persistencia de datos (guardar tareas y usuarios en archivos o bases de datos).
+    Interfaz gráfica para mejorar la experiencia del usuario.
+    Notificaciones automáticas para recordar tareas próximas a vencer.
+     
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Autores 
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    Javier Andrés Chávez Portal  - 20245512
+    Alí Efraín Chevez Merino  - 20245542
+    Sebastián Alberto Dimas Rodríguez  - 20245246
+    Erick Daniel Pineda Baires  - 20245510
+     
