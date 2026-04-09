@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
 use OpenApi\Attributes as OA;
@@ -91,7 +91,7 @@ class UserController extends Controller
                 new OA\Property(
                     property: 'roles',
                     type: 'array',
-                    items: new OA\Items(type: 'string', enum: ['admin', 'organizer', 'client', 'checker']),
+                    items: new OA\Items(type: 'string', enum: ['admin', 'organizer', 'client']),
                     example: ['client', 'organizer']
                 ),
             ])
@@ -110,17 +110,48 @@ class UserController extends Controller
             new OA\Response(response: 422, description: 'Error de validación', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ]
     )]
-    public function update(Request $request, User $user): UserResource
+    #[OA\Patch(
+        path: '/admin/users/{user}',
+        summary: 'Actualizar parcialmente usuario',
+        description: 'Actualiza de forma parcial los datos del usuario y opcionalmente sincroniza sus roles.',
+        tags: ['Admin - Users'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'user', in: 'path', required: true, description: 'ID del usuario', schema: new OA\Schema(type: 'integer')),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'name', type: 'string', maxLength: 255, example: 'Juan Actualizado'),
+                new OA\Property(property: 'email', type: 'string', format: 'email', example: 'nuevo@email.com'),
+                new OA\Property(property: 'is_active', type: 'boolean', example: true),
+                new OA\Property(
+                    property: 'roles',
+                    type: 'array',
+                    items: new OA\Items(type: 'string', enum: ['admin', 'organizer', 'client']),
+                    example: ['client', 'organizer']
+                ),
+            ])
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Usuario actualizado',
+                content: new OA\JsonContent(properties: [
+                    new OA\Property(property: 'data', ref: '#/components/schemas/UserResource'),
+                ])
+            ),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado'),
+            new OA\Response(response: 404, description: 'Usuario no encontrado'),
+            new OA\Response(response: 422, description: 'Error de validación', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
+        ]
+    )]
+    public function update(UpdateUserRequest $request, User $user): UserResource
     {
         Gate::authorize('manage-users');
 
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $user->id,
-            'is_active' => 'sometimes|boolean',
-            'roles' => 'sometimes|array',
-            'roles.*' => 'exists:roles,name',
-        ]);
+        $validated = $request->validated();
 
         $user->update(collect($validated)->except('roles')->toArray());
 

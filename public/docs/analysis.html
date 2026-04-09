@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticketera — Análisis y Diseño</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #302b63;
+            --secondary: #24243e;
+            --accent: #6c63ff;
+            --bg: #ffffff;
+            --text: #1a1a2e;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --surface: #f8fafc;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* ── Cover ────────────────────────────────────── */
+        .cover {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 40%, #4a3f8a 100%);
+            color: #fff;
+            text-align: center;
+            padding: 2rem;
+        }
+        .cover h1 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: .5rem;
+        }
+        .cover .subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            font-weight: 300;
+            opacity: .9;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+        .cover .badge {
+            display: inline-block;
+            padding: .6rem 1.8rem;
+            border: 2px solid rgba(255,255,255,.35);
+            border-radius: 50px;
+            font-size: .95rem;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            backdrop-filter: blur(4px);
+            background: rgba(255,255,255,.08);
+        }
+        .cover .date {
+            margin-top: 2.5rem;
+            font-size: .85rem;
+            opacity: .6;
+        }
+
+        /* ── Layout ───────────────────────────────────── */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        /* ── TOC ──────────────────────────────────────── */
+        .toc {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+        }
+        .toc h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            color: var(--primary);
+        }
+        .toc ol {
+            list-style: none;
+            counter-reset: toc;
+            padding: 0;
+        }
+        .toc ol li {
+            counter-increment: toc;
+            margin-bottom: .6rem;
+        }
+        .toc ol li a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            transition: color .2s;
+        }
+        .toc ol li a::before {
+            content: counter(toc) ".";
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 1.5rem;
+        }
+        .toc ol li a:hover { color: var(--accent); }
+
+        /* ── Sections ─────────────────────────────────── */
+        .section {
+            margin-bottom: 4rem;
+            page-break-inside: avoid;
+        }
+        .section-number {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            font-size: .8rem;
+            padding: .25rem .7rem;
+            border-radius: 6px;
+            margin-bottom: .5rem;
+        }
+        .section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: .5rem;
+            border-bottom: 3px solid var(--accent);
+        }
+        .section p, .section li {
+            color: #334155;
+        }
+        .section p {
+            margin-bottom: 1rem;
+        }
+
+        /* ── Tables ───────────────────────────────────── */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .9rem;
+        }
+        thead th {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            text-align: left;
+            padding: .75rem 1rem;
+        }
+        thead th:first-child { border-radius: var(--radius) 0 0 0; }
+        thead th:last-child  { border-radius: 0 var(--radius) 0 0; }
+        tbody td {
+            padding: .65rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        tbody tr:nth-child(even) { background: var(--surface); }
+        tbody tr:hover { background: #eef2ff; }
+        code, .mono {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: .85em;
+            background: #f1f5f9;
+            padding: .15rem .4rem;
+            border-radius: 4px;
+        }
+
+        /* ── Diagrams ─────────────────────────────────── */
+        .diagram-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+        .diagram-wrap .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ── Endpoint tags ────────────────────────────── */
+        .endpoint-list {
+            list-style: none;
+            padding: 0;
+        }
+        .endpoint-list li {
+            padding: .55rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: .88rem;
+        }
+        .method-tag {
+            display: inline-block;
+            font-size: .7rem;
+            font-weight: 700;
+            padding: .2rem .6rem;
+            border-radius: 4px;
+            color: #fff;
+            min-width: 58px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+        .tag-get    { background: #3b82f6; }
+        .tag-post   { background: #22c55e; }
+        .tag-put    { background: #f97316; }
+        .tag-delete { background: #ef4444; }
+        .group-title {
+            font-family: 'Inter', sans-serif;
+            font-size: .8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            padding: 1rem 0 .3rem;
+            display: block;
+            border: none;
+        }
+
+        /* ── Note box ─────────────────────────────────── */
+        .note {
+            background: #eef2ff;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.25rem;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin: 1.5rem 0;
+            font-size: .9rem;
+        }
+
+        /* ── Footer ───────────────────────────────────── */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            font-size: .8rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Print ────────────────────────────────────── */
+        @media print {
+            .cover { min-height: auto; padding: 4rem 2rem; page-break-after: always; }
+            .toc   { page-break-after: always; }
+            .section { page-break-inside: avoid; }
+            body { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     COVER
+     ══════════════════════════════════════════════════════ -->
+<div class="cover">
+    <h1>Ticketera</h1>
+    <p class="subtitle">Sistema de Gestión de Eventos y Venta de Entradas</p>
+    <span class="badge">Documento de Análisis y Diseño</span>
+    <p class="date">Abril 2026</p>
+</div>
+
+<div class="container">
+
+    <!-- ── TABLE OF CONTENTS ───────────────────────── -->
+    <nav class="toc" id="toc">
+        <h2>Tabla de Contenidos</h2>
+        <ol>
+            <li><a href="#s1">Descripción del Sistema</a></li>
+            <li><a href="#s2">Diagrama Entidad-Relación (ERD)</a></li>
+            <li><a href="#s3">Flujograma: Registro y Autenticación</a></li>
+            <li><a href="#s4">Flujograma: Compra de Entradas</a></li>
+            <li><a href="#s5">Flujograma: Validación de Entrada en Puerta</a></li>
+            <li><a href="#s6">Flujograma: Gestión de Eventos (Admin)</a></li>
+            <li><a href="#s7">Mapa de Endpoints REST</a></li>
+            <li><a href="#s8">Arquitectura Técnica</a></li>
+        </ol>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════
+         1. DESCRIPCIÓN DEL SISTEMA
+         ═══════════════════════════════════════════════ -->
+    <div class="section" id="s1">
+        <span class="section-number">Sección 1</span>
+        <h2>Descripción del Sistema</h2>
+        <p>
+            <strong>Ticketera</strong> es una plataforma web de gestión de eventos y venta de entradas que expone una
+            API RESTful protegida con autenticación basada en tokens (Laravel Sanctum). El sistema implementa un
+            modelo de control de acceso basado en roles (RBAC) con tres perfiles principales:
+        </p>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>Permisos</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Admin</strong></td>
+                        <td>
+                            <code>manage-users</code>,
+                            <code>manage-events</code>,
+                            <code>validate-tickets</code>,
+                            <code>view-reports</code>,
+                            <code>sell-tickets</code>
+                        </td>
+                        <td>Gestión completa del sistema</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Organizer</strong></td>
+                        <td>
+                            <code>manage-events</code>,
+                            <code>validate-tickets</code>,
+                            <code>view-reports</code>
+                        </td>
+                        <td>Crear y gestionar eventos propios</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Client</strong></td>
+                        <td>
+                            <code>sell-tickets</code>
+                        </td>
+                        <td>Navegar eventos, comprar entradas</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         2. DIAGRAMA ENTIDAD-RELACIÓN
+         ═══════════════════════════════════════════════ -->
+    <div class="section" id="s2">
+        <span class="section-number">Sección 2</span>
+        <h2>Diagrama Entidad-Relación (ERD)</h2>
+        <p>El siguiente diagrama muestra las entidades principales del sistema, sus atributos y las relaciones entre ellas.</p>
+        <div class="diagram-wrap">
+            <pre class="mermaid">
+erDiagram
+    users {
+        bigint id PK
+        string name
+        string email UK
+        timestamp email_verified_at
+        string password
+        boolean is_active
+        string remember_token
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    events {
+        bigint id PK
+        bigint user_id FK
+        string title
+        text description
+        string location
+        datetime date
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ticket_types {
+        bigint id PK
+        bigint event_id FK
+        string name
+        decimal price
+        int quantity
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    tickets {
+        bigint id PK
+        bigint ticket_type_id FK
+        bigint user_id FK
+        string code UK
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    attendances {
+        bigint id PK
+        bigint ticket_id FK
+        timestamp checked_in_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    roles {
+        bigint id PK
+        string name UK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    permissions {
+        bigint id PK
+        string name UK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    role_user {
+        bigint id PK
+        bigint user_id FK
+        bigint role_id FK
+    }
+
+    permission_role {
+        bigint id PK
+        bigint permission_id FK
+        bigint role_id FK
+    }
+
+    users ||--o{ events : "organiza"
+    users ||--o{ tickets : "compra"
+    events ||--o{ ticket_types : "tiene"
+    ticket_types ||--o{ tickets : "pertenece"
+    tickets ||--o| attendances : "registra"
+    users ||--o{ role_user : "tiene"
+    roles ||--o{ role_user : "asignado"
+    roles ||--o{ permission_role : "otorga"
+    permissions ||--o{ permission_role : "pertenece"
+            </pre>
+        </div>
+
+        <h3 style="margin: 1.5rem 0 .75rem; color: var(--primary);">Relaciones Clave</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Relación</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>users</code> → <code>events</code></td>
+                        <td>1:N</td>
+                        <td>Un usuario (organizador) puede crear múltiples eventos</td>
+                    </tr>
+                    <tr>
+                        <td><code>users</code> → <code>tickets</code></td>
+                        <td>1:N</td>
+                        <td>Un usuario (cliente) puede comprar múltiples entradas</td>
+                    </tr>
+                    <tr>
+                        <td><code>events</code> → <code>ticket_types</code></td>
+                        <td>1:N</td>
+                        <td>Cada evento define varios tipos de entrada (General, VIP, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td><code>ticket_types</code> → <code>tickets</code></td>
+                        <td>1:N</td>
+                        <td>Cada tipo de entrada puede tener múltiples tickets vendidos</td>
+                    </tr>
+                    <tr>
+                        <td><code>tickets</code> → <code>attendances</code></td>
+                        <td>1:1</td>
+                        <td>Cada ticket puede tener un registro de asistencia</td>
+                    </tr>
+                    <tr>
+                        <td><code>users</code> ↔ <code>roles</code></td>
+                        <td>N:M</td>
+                        <td>Relación muchos a muchos a través de <code>role_user</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>roles</code> ↔ <code>permissions</code></td>
+                        <td>N:M</td>
+                        <td>Relación muchos a muchos a través de <code>permission_role</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         3. REGISTRO Y AUTENTICACIÓN
+         ═══════════════════════════════════════════════ -->
+    <div class="section" id="s3">
+        <span class="section-number">Sección 3</span>
+        <h2>Flujograma: Registro y Autenticación</h2>
+        <p>Flujo completo del proceso de registro de nuevos usuarios e inicio de sesión con tokens Sanctum.</p>
+        <div class="diagram-wrap">
+            <pre class="mermaid">
+flowchart TD
+    A([Inicio]) --> B{¿Tiene cuenta?}
+
+    B -- No --> C["POST /api/register"]
+    C --> D{¿Datos válidos?}
+    D -- No --> E["422 Error de validación"]
+    E --> C
+    D -- Sí --> F["Crear usuario con rol client"]
+    F --> G["Generar token Sanctum"]
+    G --> H["201 Retornar token + usuario"]
+
+    B -- Sí --> I["POST /api/login"]
+    I --> J{¿Credenciales correctas?}
+    J -- No --> K["401 Credenciales inválidas"]
+    K --> I
+    J -- Sí --> L{¿Cuenta activa?}
+    L -- No --> M["403 Cuenta desactivada"]
+    L -- Sí --> N["Generar token Sanctum"]
+    N --> O["200 Retornar token + usuario"]
+
+    H --> P["Usar token en header Authorization"]
+    O --> P
+    P --> Q["Acceder a endpoints protegidos"]
+    Q --> R{¿Cerrar sesión?}
+    R -- No --> Q
+    R -- Sí --> S["POST /api/logout"]
+    S --> T["Revocar token"]
+    T --> U([Fin])
+            </pre>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         4. COMPRA DE ENTRADAS
+         ═══════════════════════════════════════════════ -->
+    <div class="section" id="s4">
+        <span class="section-number">Sección 4</span>
+        <h2>Flujograma: Compra de Entradas</h2>
+        <p>Proceso de navegación de eventos y adquisición de entradas por parte de un cliente autenticado.</p>
+        <div class="diagram-wrap">
+            <pre class="mermaid">
+flowchart TD
+    A(["Cliente autenticado"]) --> B["GET /api/events"]
+    B --> C["Ver eventos activos"]
+    C --> D["GET /api/events/{id}"]
+    D --> E["Ver detalle + tipos de entrada"]
+    E --> F{¿Desea comprar?}
+    F -- No --> C
+
+    F -- Sí --> G["POST /api/tickets"]
+    G --> H{¿Tiene rol client?}
+    H -- No --> I["403 Forbidden"]
+
+    H -- Sí --> J{¿Evento activo?}
+    J -- No --> K["422 Evento inactivo"]
+
+    J -- Sí --> L{¿Tipo pertenece al evento?}
+    L -- No --> M["422 Tipo inválido"]
+
+    L -- Sí --> N{¿Quedan entradas?}
+    N -- No --> O["422 Agotadas"]
+
+    N -- Sí --> P{¿Ya compró este tipo?}
+    P -- Sí --> Q["422 Duplicado"]
+
+    P -- No --> R["Crear ticket con UUID"]
+    R --> S["Estado: valid"]
+    S --> T["201 Retornar ticket"]
+    T --> U["GET /api/tickets"]
+    U --> V["Ver historial de compras"]
+    V --> W([Fin])
+            </pre>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         5. VALIDACIÓN EN PUERTA
+         ═══════════════════════════════════════════════ -->
+    <div class="section" id="s5">
+        <span class="section-number">Sección 5</span>
+        <h2>Flujograma: Validación de Entrada en Puerta</h2>
+        <p>Proceso de verificación y validación de entradas al momento del ingreso al evento.</p>
+        <div class="diagram-wrap">
+            <pre class="mermaid">
+flowchart TD
+    A(["Verificador en puerta"]) --> B["Escanear código UUID"]
+    B --> C["POST /api/tickets/{code}/validate"]
+    C --> D{¿Tiene permiso validate-tickets?}
+    D -- No --> E["403 Forbidden"]
+
+    D -- Sí --> F{¿Ticket existe?}
+    F -- No --> G["404 No encontrado"]
+
+    F -- Sí --> H{¿Estado del ticket?}
+    H -- "cancelled" --> I["422 Ticket cancelado"]
+    H -- "used" --> J["422 Ticket ya utilizado"]
+
+    H -- "valid" --> K["Cambiar estado a used"]
+    K --> L["Crear registro Attendance"]
+    L --> M["Registrar checked_in_at"]
+    M --> N["200 Retornar datos de asistencia"]
+    N --> O{¿Más tickets?}
+    O -- Sí --> B
+    O -- No --> P([Fin])
+            </pre>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         6. GESTIÓN DE EVENTOS (ADMIN)
+         ═══════════════════════════════════════════════ -->
+    <div class="section" id="s6">
+        <span class="section-number">Sección 6</span>
+        <h2>Flujograma: Gestión de Eventos (Admin)</h2>
+        <p>Operaciones CRUD disponibles para administradores y organizadores sobre los eventos del sistema.</p>
+        <div class="diagram-wrap">
+            <pre class="mermaid">
+flowchart TD
+    A(["Admin / Organizador"]) --> B{Acción}
+
+    B -- Listar --> C["GET /api/admin/events"]
+    C --> D{¿Es admin?}
+    D -- Sí --> E["Ver TODOS los eventos"]
+    D -- No --> F["Ver solo eventos propios"]
+
+    B -- Crear --> G["POST /api/admin/events"]
+    G --> H{¿Datos válidos?}
+    H -- No --> I["422 Error de validación"]
+    H -- Sí --> J["Crear evento"]
+    J --> K["Crear 3 tipos: General + VIP + Premium"]
+    K --> L["201 Retornar evento"]
+
+    B -- Actualizar --> M["PUT /api/admin/events/{id}"]
+    M --> N{¿Es dueño o admin?}
+    N -- No --> O["403 Forbidden"]
+    N -- Sí --> P["Actualizar evento"]
+    P --> Q["200 Retornar evento actualizado"]
+
+    B -- Eliminar --> R["DELETE /api/admin/events/{id}"]
+    R --> S{¿Es dueño o admin?}
+    S -- No --> T["403 Forbidden"]
+    S -- Sí --> U["Eliminar en CASCADE"]
+    U --> V["200 Evento eliminado"]
+
+    B -- Asistentes --> W["GET /api/admin/events/{id}/attendees"]
+    W --> X["Lista paginada de asistentes"]
+
+    E --> Y([Fin])
+    F --> Y
+    L --> Y
+    Q --> Y
+    V --> Y
+    X --> Y
+            </pre>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         7. MAPA DE ENDPOINTS REST
+         ═══════════════════════════════════════════════ -->
+    <div class="section" id="s7">
+        <span class="section-number">Sección 7</span>
+        <h2>Mapa de Endpoints REST</h2>
+        <p>Listado completo de endpoints disponibles en la API, organizados por grupo funcional.</p>
+
+        <ul class="endpoint-list">
+            <li class="group-title">Autenticación (público)</li>
+            <li><span class="method-tag tag-post">POST</span> /api/register</li>
+            <li><span class="method-tag tag-post">POST</span> /api/login</li>
+
+            <li class="group-title">Eventos (público)</li>
+            <li><span class="method-tag tag-get">GET</span> /api/events</li>
+            <li><span class="method-tag tag-get">GET</span> /api/events/{event}</li>
+
+            <li class="group-title">Autenticado</li>
+            <li><span class="method-tag tag-post">POST</span> /api/logout</li>
+            <li><span class="method-tag tag-get">GET</span> /api/tickets</li>
+            <li><span class="method-tag tag-post">POST</span> /api/tickets</li>
+            <li><span class="method-tag tag-post">POST</span> /api/tickets/{code}/validate</li>
+
+            <li class="group-title">Admin — Eventos</li>
+            <li><span class="method-tag tag-get">GET</span> /api/admin/events</li>
+            <li><span class="method-tag tag-post">POST</span> /api/admin/events</li>
+            <li><span class="method-tag tag-get">GET</span> /api/admin/events/{event}</li>
+            <li><span class="method-tag tag-put">PUT</span> /api/admin/events/{event}</li>
+            <li><span class="method-tag tag-delete">DELETE</span> /api/admin/events/{event}</li>
+            <li><span class="method-tag tag-get">GET</span> /api/admin/events/{event}/attendees</li>
+
+            <li class="group-title">Admin — Usuarios</li>
+            <li><span class="method-tag tag-get">GET</span> /api/admin/users</li>
+            <li><span class="method-tag tag-get">GET</span> /api/admin/users/{user}</li>
+            <li><span class="method-tag tag-put">PUT</span> /api/admin/users/{user}</li>
+            <li><span class="method-tag tag-delete">DELETE</span> /api/admin/users/{user}</li>
+        </ul>
+
+        <div class="note">
+            <strong>Documentación interactiva:</strong> La especificación OpenAPI 3.0 completa con ejemplos de
+            request/response está disponible en <code>/docs</code> (Swagger UI).
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         8. ARQUITECTURA TÉCNICA
+         ═══════════════════════════════════════════════ -->
+    <div class="section" id="s8">
+        <span class="section-number">Sección 8</span>
+        <h2>Arquitectura Técnica</h2>
+
+        <h3 style="margin: 1.5rem 0 .75rem; color: var(--primary);">Stack Tecnológico</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Componente</th>
+                        <th>Tecnología</th>
+                        <th>Versión</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Framework</td><td>Laravel</td><td>13.x</td></tr>
+                    <tr><td>Lenguaje</td><td>PHP</td><td>8.3+</td></tr>
+                    <tr><td>Autenticación</td><td>Laravel Sanctum</td><td>4.x</td></tr>
+                    <tr><td>Documentación API</td><td>swagger-php (OpenAPI 3.0)</td><td>6.x</td></tr>
+                    <tr><td>Testing</td><td>Pest</td><td>4.x</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 style="margin: 1.5rem 0 .75rem; color: var(--primary);">Patrones de Diseño</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patrón</th>
+                        <th>Implementación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Resource Controllers</td>
+                        <td><code>apiResource()</code> para rutas RESTful</td>
+                    </tr>
+                    <tr>
+                        <td>Form Requests</td>
+                        <td>
+                            <code>RegisterRequest</code>,
+                            <code>LoginRequest</code>,
+                            <code>StoreEventRequest</code>,
+                            <code>UpdateEventRequest</code>,
+                            <code>StoreTicketRequest</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>API Resources</td>
+                        <td>
+                            <code>EventResource</code>,
+                            <code>TicketResource</code>,
+                            <code>UserResource</code>,
+                            <code>AttendanceResource</code>,
+                            <code>TicketTypeResource</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Policies &amp; Gates</td>
+                        <td>Autorización a nivel de modelo y acción</td>
+                    </tr>
+                    <tr>
+                        <td>RBAC</td>
+                        <td>Roles y permisos con tablas pivote</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 style="margin: 1.5rem 0 .75rem; color: var(--primary);">Flujo de una Petición</h3>
+        <div class="diagram-wrap">
+            <pre class="mermaid">
+flowchart LR
+    A["Cliente HTTP"] --> B["Sanctum Middleware"]
+    B --> C["Router"]
+    C --> D["Form Request Validation"]
+    D --> E["Controller"]
+    E --> F["Policy / Gate"]
+    F --> G["Eloquent Model"]
+    G --> H[("Database")]
+    G --> I["API Resource"]
+    I --> J["JSON Response"]
+    J --> A
+            </pre>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <p>Ticketera &mdash; Documento de Análisis y Diseño &mdash; Generado en Abril 2026</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+            primaryColor: '#eef2ff',
+            primaryTextColor: '#1a1a2e',
+            primaryBorderColor: '#6c63ff',
+            lineColor: '#64748b',
+            secondaryColor: '#f8fafc',
+            tertiaryColor: '#fff',
+            fontSize: '14px'
+        },
+        flowchart: {
+            htmlLabels: true,
+            curve: 'basis',
+            useMaxWidth: true
+        },
+        er: {
+            useMaxWidth: true
+        }
+    });
+</script>
+
+</body>
+</html>

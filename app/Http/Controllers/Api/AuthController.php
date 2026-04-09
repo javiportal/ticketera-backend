@@ -95,17 +95,18 @@ class AuthController extends Controller
             new OA\Response(response: 403, description: 'Cuenta desactivada', content: new OA\JsonContent(properties: [
                 new OA\Property(property: 'message', type: 'string', example: 'Account deactivated'),
             ])),
+            new OA\Response(response: 422, description: 'Error de validación', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
         ]
     )]
     public function login(LoginRequest $request): JsonResponse
     {
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             return response()->json(['message' => 'Account deactivated'], 403);
         }
 

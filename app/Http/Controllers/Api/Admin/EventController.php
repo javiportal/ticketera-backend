@@ -44,7 +44,7 @@ class EventController extends Controller
         $user = auth()->user();
         $query = Event::with('organizer', 'ticketTypes');
 
-        if (!$user->hasRole('admin')) {
+        if (! $user->hasRole('admin')) {
             $query->where('user_id', $user->id);
         }
 
@@ -156,6 +156,39 @@ class EventController extends Controller
         path: '/admin/events/{event}',
         summary: 'Actualizar evento',
         description: 'Actualiza los datos de un evento existente. Todos los campos son opcionales.',
+        tags: ['Admin - Events'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'event', in: 'path', required: true, description: 'ID del evento', schema: new OA\Schema(type: 'integer')),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'title', type: 'string', maxLength: 255, example: 'Concierto Rock Actualizado'),
+                new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Descripción actualizada'),
+                new OA\Property(property: 'location', type: 'string', maxLength: 255, example: 'Nuevo Estadio'),
+                new OA\Property(property: 'date', type: 'string', format: 'date-time', example: '2026-07-20T21:00:00'),
+                new OA\Property(property: 'is_active', type: 'boolean', example: true),
+            ])
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Evento actualizado',
+                content: new OA\JsonContent(properties: [
+                    new OA\Property(property: 'data', ref: '#/components/schemas/EventResource'),
+                ])
+            ),
+            new OA\Response(response: 401, description: 'No autenticado'),
+            new OA\Response(response: 403, description: 'No autorizado'),
+            new OA\Response(response: 404, description: 'Evento no encontrado'),
+            new OA\Response(response: 422, description: 'Error de validación', content: new OA\JsonContent(ref: '#/components/schemas/ValidationError')),
+        ]
+    )]
+    #[OA\Patch(
+        path: '/admin/events/{event}',
+        summary: 'Actualizar parcialmente evento',
+        description: 'Actualiza parcialmente los datos de un evento existente. Todos los campos son opcionales.',
         tags: ['Admin - Events'],
         security: [['bearerAuth' => []]],
         parameters: [
