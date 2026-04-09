@@ -1,117 +1,154 @@
-Sistema de Gestión de Tareas 
-Descripción del Proyecto 
+# Ticketera
 
-El Sistema de Gestión de Tareas  es una aplicación que permite a los usuarios crear, asignar y rastrear tareas de manera efectiva. Está diseñado para facilitar la colaboracion en equipo y asegurar el cumplimiento de las tareas dentro del tiempo asignado.  
+Sistema de gestión de eventos y venta de entradas construido con Laravel 13. Permite a organizadores crear eventos con diferentes tipos de entrada, a clientes comprar tickets y a operadores validar entradas en puerta mediante check-in.
 
-Caracteristicas principales: 
+## Stack Tecnológico
 
-    Crear y gestionar tareas.
-    Asignar tareas a usuarios especificos.
-    Agregar comentarios para actualizar el progreso de una tarea.
-    Cambiar el estado de las tareas (por ejemplo: "pendiente", "en progreso", "completada").
-    Supervisar la productividad mediante la gestión de tareas y su estado.
-     
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Estructura del proyecto 
+- **PHP** 8.3+
+- **Laravel** 13
+- **Base de datos** SQLite (configurable a MySQL/PostgreSQL)
+- **Autenticación API** Laravel Sanctum (tokens de acceso personal)
+- **Frontend** Vite + Tailwind CSS v4
+- **Testing** Pest
 
-El proyecto está organizado en los siguientes paquetes: 
- 
-src/
-├── modelo/
-│   ├── Tarea.java         - Clase que representa una tarea con atributos como titulo, descripción y estado.
-│   ├── Usuario.java       - Clase que representa a un usuario con atributos como nombre, correo y rol.
-│   ├── Comentario.java    - Clase que representa un comentario asociado a una tarea.
-│   └── Proyecto.java      - Clase que agrupa varias tareas relacionadas.
-├── servicio/
-│   ├── GestorTareas.java  - Clase que gestiona todas las operaciones relacionadas con las tareas.
-│   └── GestorUsuarios.java - Clase que gestiona todas las operaciones relacionadas con los usuarios.
-└── principal/
-    └── Main.java          - Clase principal que contiene la interfaz de consola para interactuar con el sistema.
- 
- 
-Instrucciones para compilar y ejecutar 
-Requisitos: 
+## Requisitos Previos
 
-    Java Development Kit (JDK) instalado.
-    Un editor de texto o IDE (como IntelliJ IDEA, Eclipse o VS Code).
-     
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Pasos de instalacion: 
+- PHP >= 8.3
+- Composer
+- Node.js y npm
 
-    Compilar el proyecto :
-    Opcion 1: Una vez se tenga descargado el achivo, crear un folder llamado "Modelo" SI NO SE CREA SOLO AL DESCOMPRIMIR, y descomprimir el zip dentro de el, luego abre su IDE seleciona nuevo proyecto y se va a la carpeta donde lo         descomprimio y seleciona "open"
-	
-    Opcion 2(no siempre funciona) : Abre una terminal en la raíz del proyecto y ejecuta el siguiente comando para compilar todas las clases: 
-    bash
-    
-	1
-	javac src/modelo/*.java src/servicio/*.java src/utilidades/*.java src/principal/Main.java
+## Instalación
 
-Ejecutar el proyecto :
-Una vez compilado, ejecuta el programa con el siguiente comando: 
-bash
- 
-    java -cp src principal.Main
-     
-     
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    Interactuar con el sistema :
-    Al ejecutar el programa, veras un menu interactivo con opciones para: 
-        Crear tareas.
-        Ver tareas asignadas.
-        Agregar comentarios a una tarea.
-        Cambiar el estado de una tarea.
-        Registrar nuevos usuarios.
-         
-     
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Funcionalidades Implementadas 
+```bash
+# Clonar el repositorio
+git clone <url-del-repositorio>
+cd ticketera
 
-    Gestión de Tareas : 
-        Crear nuevas tareas con titulo, descripcion y fecha de vencimiento.
-        Asignar tareas a usuarios especificos.
-        Cambiar el estado de las tareas (pendiente, en progreso, completada).
-         
+# Instalar dependencias de PHP
+composer install
 
-    Comentarios : 
-        Agregar comentarios a una tarea para proporcionar actualizaciones o retroalimentacion.
-         
+# Instalar dependencias de Node
+npm install
 
-    Gestion de usuarios : 
-        Registrar nuevos usuarios con roles especificos (administrador, usuario, supervisor).
-        Asignar tareas a usuarios desde el rol de supervisor.
-         
+# Configurar el entorno
+cp .env.example .env
+php artisan key:generate
 
-    Validaciones : 
-        Validar correos electronicos y fechas de vencimiento para garantizar datos correctos.
-         
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Crear la base de datos y poblarla con datos de ejemplo
+php artisan migrate --seed
 
-Consideraciones especiales 
+# Iniciar el servidor de desarrollo
+composer dev
+```
 
-    Roles de Usuario : 
-        Administrador : Gestiona el acceso de todos los usuarios.
-        Usuario : Crea y gestiona sus propias tareas.
-        Supervisor : Asigna tareas y monitorea el progreso de los usuarios.
-         
+El comando `composer dev` levanta en paralelo el servidor PHP, el worker de colas, el visor de logs (Pail) y el servidor de Vite.
 
-    Proyectos (Opcional) : 
-        La clase Proyecto permite agrupar tareas relacionadas. Esta funcionalidad puede ser expandida en futuras versiones.
-         
-     
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  
-Este sistema es altamente escalable y puede mejorarse en el futuro agregando características como: 
+## Estructura del Proyecto
 
-    Persistencia de datos (guardar tareas y usuarios en archivos o bases de datos).
-    Interfaz gráfica para mejorar la experiencia del usuario.
-    Notificaciones automáticas para recordar tareas próximas a vencer.
-     
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   └── Api/
+│   │       ├── AuthController.php        # Registro, login, logout
+│   │       ├── EventController.php       # Listado público de eventos
+│   │       ├── TicketController.php       # Compra de entradas
+│   │       ├── AttendanceController.php   # Validación en puerta
+│   │       └── Admin/
+│   │           ├── EventController.php    # CRUD de eventos (admin/organizador)
+│   │           └── UserController.php     # Gestión de usuarios (admin)
+│   ├── Requests/                          # Form Requests con validación
+│   └── Resources/                         # API Resources (transformación de respuestas)
+├── Models/                                # User, Role, Permission, Event, TicketType, Ticket, Attendance
+├── Policies/                              # EventPolicy, TicketPolicy
+└── Providers/                             # Gates de autorización
+```
 
-Autores 
+## Modelo de Datos
 
-    Javier Andrés Chávez Portal  - 20245512
-    Alí Efraín Chevez Merino  - 20245542
-    Sebastián Alberto Dimas Rodríguez  - 20245246
-    Erick Daniel Pineda Baires  - 20245510
-     
+| Modelo | Descripción |
+|--------|-------------|
+| **User** | Usuarios con campo `is_active` y relación con roles |
+| **Role** | Roles del sistema (admin, organizador, cliente) |
+| **Permission** | Permisos granulares asignados a roles |
+| **Event** | Eventos con título, descripción, ubicación, fecha y organizador |
+| **TicketType** | Tipos de entrada por evento (nombre, precio, cantidad disponible) |
+| **Ticket** | Entrada comprada con código UUID único y estado (`valid`, `used`, `cancelled`) |
+| **Attendance** | Registro de check-in con timestamp |
+
+## API Endpoints
+
+### Públicos
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/register` | Registro de usuario |
+| `POST` | `/api/login` | Inicio de sesión (devuelve token) |
+| `GET` | `/api/events` | Listar eventos activos |
+| `GET` | `/api/events/{event}` | Ver detalle de un evento |
+
+### Autenticados (Bearer Token)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/api/logout` | Cerrar sesión |
+| `GET` | `/api/tickets` | Mis entradas |
+| `POST` | `/api/tickets` | Comprar entrada |
+| `POST` | `/api/tickets/{code}/validate` | Validar entrada en puerta |
+
+### Administración (Bearer Token + permisos)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/api/admin/events` | Listar eventos (admin: todos, organizador: los suyos) |
+| `POST` | `/api/admin/events` | Crear evento |
+| `GET` | `/api/admin/events/{event}` | Ver evento |
+| `PUT` | `/api/admin/events/{event}` | Actualizar evento |
+| `DELETE` | `/api/admin/events/{event}` | Eliminar evento (solo admin) |
+| `GET` | `/api/admin/events/{event}/attendees` | Listado de asistentes |
+| `GET` | `/api/admin/users` | Listar usuarios |
+| `GET` | `/api/admin/users/{user}` | Ver usuario |
+| `PUT` | `/api/admin/users/{user}` | Actualizar usuario |
+| `DELETE` | `/api/admin/users/{user}` | Eliminar usuario |
+
+## Roles y Permisos
+
+El sistema implementa RBAC (Role-Based Access Control):
+
+- **Admin** — Gestión completa de eventos, usuarios y reportes.
+- **Organizador** — Crea y administra sus propios eventos.
+- **Cliente** — Compra entradas y consulta sus tickets.
+
+Permisos disponibles: `manage-users`, `manage-events`, `validate-tickets`, `view-reports`.
+
+## Reglas de Negocio
+
+- Solo se pueden comprar entradas de eventos activos.
+- Stock limitado por tipo de entrada.
+- Un usuario solo puede comprar una entrada por tipo de ticket.
+- La validación en puerta marca el ticket como `used` y registra la asistencia.
+- Usuarios con `is_active = false` no pueden iniciar sesión.
+
+## Testing
+
+```bash
+php artisan test
+```
+
+El proyecto utiliza [Pest](https://pestphp.com/) como framework de testing.
+
+## Usuarios de Prueba
+
+Al ejecutar el seeder se crean los siguientes usuarios:
+
+| Rol | Email |
+|-----|-------|
+| Admin | `admin@ticketera.com` |
+| Organizador | _(definido en el seeder)_ |
+| Cliente | _(definido en el seeder)_ |
+
+> Consulta `database/seeders/DatabaseSeeder.php` para ver las credenciales completas.
+
+## Licencia
+
+Este proyecto utiliza el framework Laravel, licenciado bajo la [MIT License](https://opensource.org/licenses/MIT).
