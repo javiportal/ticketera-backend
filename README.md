@@ -78,7 +78,7 @@ El comando `composer dev` levanta el servidor PHP, el worker de colas, el visor 
 Una vez iniciado el proyecto:
 
 - aplicación local: `http://127.0.0.1:8000`
-- Swagger UI: `http://127.0.0.1:8000/docs`
+- Swagger UI: `http://127.0.0.1:8000/swagger`
 - JSON OpenAPI: `http://127.0.0.1:8000/api/docs/json`
 
 ## Estructura Del Proyecto
@@ -279,7 +279,7 @@ Para la defensa se recomienda preparar una colección que cubra:
 Durante la demo conviene seguir este orden:
 
 1. mostrar `README.md` y estructura del proyecto
-2. abrir Swagger en `/docs`
+2. abrir Swagger en `/swagger`
 3. ejecutar un flujo público
 4. autenticar un usuario
 5. demostrar seguridad con `401` y `403`

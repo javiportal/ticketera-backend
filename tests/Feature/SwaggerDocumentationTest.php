@@ -6,6 +6,12 @@ beforeEach(function () {
     $this->seed();
 });
 
+it('serves the swagger ui from the swagger route', function () {
+    $this->get('/swagger')
+        ->assertSuccessful()
+        ->assertSee('SwaggerUIBundle', false);
+});
+
 it('documents patch update operations and login validation responses', function () {
     $response = $this->getJson('/api/docs/json')->assertSuccessful();
     $spec = $response->json();

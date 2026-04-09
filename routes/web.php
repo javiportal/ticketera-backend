@@ -7,7 +7,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/docs', [SwaggerController::class, 'ui'])->name('swagger.ui');
+Route::get('/swagger', [SwaggerController::class, 'ui'])->name('swagger.ui');
 Route::get('/api/docs/json', [SwaggerController::class, 'json'])->name('swagger.json');
 
 Route::get('/docs/analysis', function () {
